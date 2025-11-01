@@ -200,7 +200,7 @@ const Header = React.memo(() => {
       <AnimatePresence>
         {isOpen && (
           <motion.div
-            className="fixed top-0 left-0 w-full h-screen bg-[#FFFBF0] z-65 flex flex-col justify-between p-6"
+            className="fixed top-0 left-0 w-full h-dvh bg-[#FFFBF0] z-65 flex flex-col justify-between p-6"
             initial={{ y: "-100%", opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             exit={{ y: "-100%", opacity: 0 }}
