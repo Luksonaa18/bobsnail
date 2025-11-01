@@ -58,6 +58,21 @@ const Header = React.memo(() => {
       document.body.style.overflow = "auto";
     };
   }, [isOpen, showCart]);
+  useEffect(() => {
+    const updateHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    };
+
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    window.addEventListener("orientationchange", updateHeight);
+
+    return () => {
+      window.removeEventListener("resize", updateHeight);
+      window.removeEventListener("orientationchange", updateHeight);
+    };
+  }, []);
 
   return (
     <header className="w-full bg-[#FFFBF0] relative z-50 shadow-md">
@@ -81,7 +96,10 @@ const Header = React.memo(() => {
 
           {/* Desktop Cart */}
           {isUser && (
-            <div className="relative cursor-pointer" onClick={() => setShowCart(true)}>
+            <div
+              className="relative cursor-pointer"
+              onClick={() => setShowCart(true)}
+            >
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs">
                   {cartCount}
@@ -117,7 +135,11 @@ const Header = React.memo(() => {
           )}
 
           <div className="cursor-pointer" onClick={handleToggle}>
-            {isOpen ? <IoClose className="text-3xl text-[#353C1B]" /> : <IoMenu className="text-3xl text-[#353C1B]" />}
+            {isOpen ? (
+              <IoClose className="text-3xl text-[#353C1B]" />
+            ) : (
+              <IoMenu className="text-3xl text-[#353C1B]" />
+            )}
           </div>
         </div>
       </nav>
@@ -134,7 +156,10 @@ const Header = React.memo(() => {
           >
             <div className="flex justify-between items-center mb-6">
               <h3 className="font-bold text-2xl">Your Cart</h3>
-              <IoClose className="text-2xl cursor-pointer" onClick={() => setShowCart(false)} />
+              <IoClose
+                className="text-2xl cursor-pointer"
+                onClick={() => setShowCart(false)}
+              />
             </div>
 
             {cartItems.length === 0 ? (
@@ -144,15 +169,27 @@ const Header = React.memo(() => {
             ) : (
               <div className="space-y-6 flex-1">
                 {cartItems.map((item) => (
-                  <div key={item._id} className="flex items-center justify-between border-b pb-4">
+                  <div
+                    key={item._id}
+                    className="flex items-center justify-between border-b pb-4"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="relative w-16 h-16">
-                        <Image src={item.imageUrl} alt={item.name} fill className="object-cover rounded-md" />
+                        <Image
+                          src={item.imageUrl}
+                          alt={item.name}
+                          fill
+                          className="object-cover rounded-md"
+                        />
                       </div>
                       <div>
                         <p className="font-semibold">{item.name}</p>
-                        <p className="text-gray-600">${item.price.toFixed(2)}</p>
-                        <p className="text-gray-500 text-sm">Qty: {item.quantity}</p>
+                        <p className="text-gray-600">
+                          ${item.price.toFixed(2)}
+                        </p>
+                        <p className="text-gray-500 text-sm">
+                          Qty: {item.quantity}
+                        </p>
                       </div>
                     </div>
                     <button
