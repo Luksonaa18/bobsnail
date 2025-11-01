@@ -1,6 +1,21 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { Commissioner, Creepster } from "next/font/google"; // 👈 added Creepster
+
+// Commissioner (for general text)
+const commissioner = Commissioner({
+  subsets: ["latin"],
+  weight: ["400", "700"],
+  variable: "--font-commissioner",
+});
+
+// Creepster (for Halloween headings)
+const creepster = Creepster({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-creepster",
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -25,7 +40,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${commissioner.variable} ${geistMono.variable} ${creepster.variable} antialiased`}
       >
         {children}
       </body>
