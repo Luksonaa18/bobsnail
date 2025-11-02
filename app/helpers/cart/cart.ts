@@ -1,3 +1,4 @@
+const url = process.env.NEXT_PUBLIC_API_URL;
 export const addToCart = async (
   productId: string,
   quantity: number,
@@ -6,7 +7,7 @@ export const addToCart = async (
   if (!token) throw new Error("User is not authenticated");
 
   try {
-    const res = await fetch("http://localhost:5000/cart/add", {
+    const res = await fetch(`${url}/cart/add`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -27,7 +28,7 @@ export const getCartItems = async (token: string) => {
   if (!token) throw new Error("User is not authenticated");
 
   try {
-    const res = await fetch("http://localhost:5000/cart", {
+    const res = await fetch(`${url}/cart`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
@@ -40,7 +41,7 @@ export const getCartItems = async (token: string) => {
 
 export const removeFromCart = async (productId: string) => {
   try {
-    const res = await fetch("http://localhost:5000/cart/remove", {
+    const res = await fetch(`${url}/cart/remove`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",

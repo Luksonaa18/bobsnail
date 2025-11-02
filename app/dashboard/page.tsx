@@ -6,11 +6,15 @@ import { motion } from "framer-motion";
 import { useAuthStore } from "@/zustand";
 import { IoMdArrowRoundBack } from "react-icons/io";
 
+import {
+  createProduct,
+  updateProduct,
+  deleteProduct,
+} from "../helpers/products/products";
 
-import { createProduct, updateProduct, deleteProduct } from "../helpers/products/products";
-import AddProductForm from "../tasks/page";
 import UpdateForm from "../tasks/Update";
 import Loading from "../loading-state/Loading";
+import AddProductForm, { ProductFormInputs } from "../tasks/page";
 
 interface Product {
   _id: string;
@@ -31,17 +35,21 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showTasks, setShowTasks] = useState(false);
-  const [activeTask, setActiveTask] = useState<"add" | "update" | "delete" | null>(null);
+  const [activeTask, setActiveTask] = useState<
+    "add" | "update" | "delete" | null
+  >(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
   useEffect(() => {
     if (!user || user.role !== "admin") router.push("/");
   }, [user, router]);
-
+const url = process.env.NEXT_PUBLIC_API_URL;
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const res = await fetch("http://localhost:5000/products");
+        const res = await fetch(
+          `${url}/products`
+        );
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         const data = await res.json();
         setProducts(data);
@@ -54,26 +62,32 @@ const Page = () => {
     fetchProducts();
   }, []);
 
-  const handleProductCreate = async (product: any) => {
+  const handleProductCreate = async (product: ProductFormInputs) => {
     try {
       const created = await createProduct(product, token ?? "");
       setProducts((prev) => [...prev, created]);
       alert("Product created successfully");
     } catch (err) {
+      console.error(err);
       alert("Failed to create product");
     }
   };
 
-  const handleProductUpdate = async (product: Product) => {
+  const handleProductUpdate = async (product: Product, newFiles?: File[]) => {
     if (!product._id) return;
     try {
-      const updated = await updateProduct(product._id, product, token ?? "");
+      const updated = await updateProduct(
+        product._id,
+        { ...product, images: newFiles },
+        token ?? ""
+      );
       setProducts((prev) =>
         prev.map((p) => (p._id === updated._id ? updated : p))
       );
       alert("Product updated successfully");
       setSelectedProduct(null);
     } catch (err) {
+      console.error(err);
       alert("Failed to update product");
     }
   };
@@ -84,6 +98,7 @@ const Page = () => {
       setProducts((prev) => prev.filter((p) => p._id !== id));
       alert("Product deleted successfully");
     } catch (err) {
+      console.error(err);
       alert("Failed to delete product");
     }
   };
@@ -126,7 +141,24 @@ const Page = () => {
               className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl p-6 md:p-8 mb-12 flex flex-col md:flex-row justify-center gap-6 flex-wrap"
             >
               {activeTask === "add" ? (
-                <AddProductForm onAdd={handleProductCreate} />
+                <AddProductForm
+                  onAdd={handleProductCreate}
+                  uploadToS3={async (file: File) => {
+                    const formData = new FormData();
+                    formData.append("file", file);
+                    const res = await fetch(
+                      `${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`,
+                      {
+                        method: "POST",
+                        headers: { Authorization: `Bearer ${token}` },
+                        body: formData,
+                      }
+                    );
+                    if (!res.ok) throw new Error("Failed to upload image");
+                    const data = await res.json();
+                    return data.url;
+                  }}
+                />
               ) : (
                 <motion.button
                   whileHover={{ scale: 1.05 }}
@@ -160,6 +192,7 @@ const Page = () => {
 
           {error && <p className="text-red-500 text-lg mb-4">{error}</p>}
 
+          {/* Product Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8 w-full justify-items-center">
             {products.map((product) => (
               <motion.div
@@ -172,12 +205,18 @@ const Page = () => {
                 </h2>
                 <div className="w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 mb-4">
                   <img
-                    src={product.images?.[0] || product.imageUrl || "/placeholder.png"}
+                    src={
+                      product.images?.[0] ||
+                      product.imageUrl ||
+                      "/placeholder.png"
+                    }
                     alt={product.name}
                     className="w-full h-full object-cover rounded-2xl"
                   />
                 </div>
-                <p className="font-bold text-gray-700 mb-2">${product.price.toFixed(2)}</p>
+                <p className="font-bold text-gray-700 mb-2">
+                  ${product.price.toFixed(2)}
+                </p>
                 <p className="text-gray-500 mb-4">Stock: {product.stock}</p>
 
                 {activeTask === "update" && (

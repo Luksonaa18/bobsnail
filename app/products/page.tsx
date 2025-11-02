@@ -31,7 +31,6 @@ const Products = () => {
     addToCart(product);
   };
 
-  // ✅ Fetch products
   const fetchProducts = useCallback(
     async (showGlobalLoader = false) => {
       try {

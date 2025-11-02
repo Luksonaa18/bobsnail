@@ -18,7 +18,7 @@ export default function ProfilePage() {
   const logout = useAuthStore((state) => state.logout);
 
   useEffect(() => setHydrated(true), []);
-
+  const url = process.env.NEXT_PUBLIC_API_URL;
   useEffect(() => {
     if (hydrated && user?.role === "admin") {
       router.push("/admin");
@@ -30,7 +30,7 @@ export default function ProfilePage() {
       if (!hydrated || !token) return;
       if (!user) return router.push("/login");
       try {
-        const res = await fetch("http://localhost:5000/users/me", {
+        const res = await fetch(`${url}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error("Failed to fetch profile");
@@ -46,7 +46,6 @@ export default function ProfilePage() {
   }, [hydrated, token]);
 
   if (!hydrated || loading) return <Loading />;
-  
 
   return (
     <>
@@ -97,7 +96,7 @@ export default function ProfilePage() {
                   logout(); // clear auth state
                   router.push("/login"); // redirect to login page
                 }}
-                className="mt-4 w-full bg-orange-500/20 rounded-xl py-3 text-orange-300 font-semibold text-center md:text-left"
+                className="mt-4  w-full bg-orange-500/20 rounded-xl py-3 text-orange-300 font-semibold text-center cursor-pointer"
               >
                 Log Out
               </button>

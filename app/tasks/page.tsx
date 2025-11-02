@@ -4,28 +4,32 @@ import { useForm } from "react-hook-form";
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 
-type ProductFormInputs = {
+export type ProductFormInputs = {
   _id?: string;
   name: string;
   description: string;
   price: number;
   stock: number;
-  images?: File[]; // files to upload
+  newImages?: File[];       // files to upload
+  existingImages?: string[]; // already uploaded images
 };
 
 interface AddProductFormProps {
-  onAdd: (product: ProductFormInputs) => void;
+  onAdd: (product: Omit<ProductFormInputs, "newImages"> & { images?: string[] }) => void;
+  uploadToS3: (file: File) => Promise<string>;
 }
 
-const AddProductForm = ({ onAdd }: AddProductFormProps) => {
+const AddProductForm = ({ onAdd, uploadToS3 }: AddProductFormProps) => {
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
   } = useForm<ProductFormInputs>();
+
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
+  const [uploading, setUploading] = useState(false);
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
     setImages(acceptedFiles);
@@ -38,11 +42,24 @@ const AddProductForm = ({ onAdd }: AddProductFormProps) => {
     multiple: true,
   });
 
-  const onSubmit = (data: ProductFormInputs) => {
-    onAdd({ ...data, images });
-    reset();
-    setImages([]);
-    setPreviews([]);
+  const onSubmit = async (data: ProductFormInputs) => {
+    setUploading(true);
+    try {
+      const imageUrls: string[] = await Promise.all(
+        images.map((file) => uploadToS3(file))
+      );
+
+      onAdd({ ...data, images: imageUrls });
+
+      reset();
+      setImages([]);
+      setPreviews([]);
+    } catch (err) {
+      console.error(err);
+      alert("Failed to upload images. Try again.");
+    } finally {
+      setUploading(false);
+    }
   };
 
   return (
@@ -50,39 +67,33 @@ const AddProductForm = ({ onAdd }: AddProductFormProps) => {
       <input
         {...register("name", { required: true })}
         placeholder="Name"
-        {...(errors.name && (
-          <span className="text-red-500">Name is required</span>
-        ))}
         className="border p-2 rounded-lg"
       />
+      {errors.name && <span className="text-red-500">Name is required</span>}
+
       <textarea
         {...register("description")}
         placeholder="Description"
         className="border p-2 rounded-lg"
-        {...(errors.description && (
-          <span className="text-red-500">Description is required</span>
-        ))}
       />
+      {errors.description && <span className="text-red-500">Description is required</span>}
+
       <input
-        {...register("price", { valueAsNumber: true })}
+        {...register("price", { valueAsNumber: true, required: true })}
         type="number"
         placeholder="Price"
         className="border p-2 rounded-lg"
-        {...(errors.price && (
-          <span className="text-red-500">Price is required</span>
-        ))}
       />
+      {errors.price && <span className="text-red-500">Price is required</span>}
+
       <input
-        {...register("stock", { valueAsNumber: true })}
+        {...register("stock", { valueAsNumber: true, required: true })}
         type="number"
         placeholder="Stock"
-        {...(errors.stock && (
-          <span className="text-red-500">Stock is required</span>
-        ))}
         className="border p-2 rounded-lg"
       />
+      {errors.stock && <span className="text-red-500">Stock is required</span>}
 
-      {/* Drag & Drop Area */}
       <div
         {...getRootProps()}
         className="border-2 border-dashed p-6 rounded-lg text-center cursor-pointer hover:border-green-500"
@@ -91,7 +102,6 @@ const AddProductForm = ({ onAdd }: AddProductFormProps) => {
         <p>Drag & drop images here, or click to select files</p>
       </div>
 
-      {/* Previews */}
       {previews.length > 0 && (
         <div className="mt-4 flex gap-4 flex-wrap">
           {previews.map((src, index) => (
@@ -107,9 +117,12 @@ const AddProductForm = ({ onAdd }: AddProductFormProps) => {
 
       <button
         type="submit"
-        className="px-4 py-2 bg-green-500 text-white rounded-lg"
+        className={`px-4 py-2 rounded-lg text-white ${
+          uploading ? "bg-gray-400 cursor-not-allowed" : "bg-green-500"
+        }`}
+        disabled={uploading}
       >
-        Add Product
+        {uploading ? "Uploading..." : "Add Product"}
       </button>
     </form>
   );

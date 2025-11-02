@@ -58,7 +58,10 @@ export default function RegisterPage() {
           className="border p-2"
           required
         />
-        <button type="submit" className="bg-blue-500 p-2 text-white cursor-pointer">
+        <button
+          type="submit"
+          className="bg-blue-500 p-2 text-white cursor-pointer"
+        >
           Register
         </button>
         <button

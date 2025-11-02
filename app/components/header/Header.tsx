@@ -176,7 +176,7 @@ const Header = React.memo(() => {
                     <div className="flex items-center gap-3">
                       <div className="relative w-16 h-16">
                         <Image
-                          src={item.imageUrl}
+                          src="/eccom/asd.png"
                           alt={item.name}
                           fill
                           className="object-cover rounded-md"

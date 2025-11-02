@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const CheckoutPage = () => {
+  const url = process.env.NEXT_PUBLIC_API_URL;
   const cartItems = useCartStore((state) => state.cartItems);
   const user = useAuthStore((state) => state.user);
   const router = useRouter();
@@ -30,7 +31,7 @@ const CheckoutPage = () => {
     setLoading(true);
 
     try {
-      const res = await fetch("http://localhost:5000/checkout", {
+      const res = await fetch(`${url}/checkout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ user, cartItems, total }),
@@ -41,7 +42,7 @@ const CheckoutPage = () => {
 
       alert(`✅ Checkout successful! Total: $${total.toFixed(2)}. Check your email.`);
       
-      // Clear cart after successful checkout
+    
       useCartStore.getState().clearCart();
 
       router.push("/thank-you");
@@ -61,7 +62,7 @@ const CheckoutPage = () => {
         <p className="text-gray-500">Your cart is empty</p>
       ) : (
         <div className="w-full max-w-4xl grid md:grid-cols-2 gap-8">
-          {/* Cart Items */}
+          
           <div className="bg-white shadow-lg rounded-2xl p-6 space-y-4">
             <h2 className="font-bold text-xl mb-4">Order Summary</h2>
             {cartItems.map((item) => (
@@ -72,7 +73,7 @@ const CheckoutPage = () => {
                 <div className="flex items-center gap-4">
                   <div className="relative w-16 h-16">
                     <Image
-                      src={item.imageUrl}
+                      src="/eccom/asd.png"
                       alt={item.name}
                       fill
                       className="object-cover rounded-md"
@@ -96,7 +97,7 @@ const CheckoutPage = () => {
             </div>
           </div>
 
-          {/* Checkout / Payment */}
+        
           <div className="bg-white shadow-lg rounded-2xl p-6 flex flex-col gap-6">
             <h2 className="font-bold text-xl">Billing & Payment</h2>
             <p className="text-gray-500">
@@ -113,6 +114,7 @@ const CheckoutPage = () => {
           </div>
         </div>
       )}
+      <button className=" cursor-pointer mt-4 w-20 h-10 bg-orange-500 border text-black rounded-lg hover:text-white hover:bg-black transition-all" onClick={()=>router.back()}>Back</button>
     </div>
   );
 };

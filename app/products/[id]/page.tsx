@@ -8,6 +8,7 @@ import Loading from "@/app/loading-state/Loading";
 import { Product, useAuthStore, useCartStore } from "@/zustand";
 
 const ProductPage = () => {
+  const url = process.env.NEXR_PUBLIC_API_URL;
   const params = useParams();
   const { id } = params;
   const router = useRouter();
@@ -56,7 +57,7 @@ const ProductPage = () => {
       <div className="max-w-3xl mx-auto p-8">
         <h1 className="text-3xl font-bold mb-4">{product.name}</h1>
         <img
-          src={product.imageUrl?.[0] || product.imageUrl}
+          src="/eccom/pumpkin.png"
           alt={product.name}
           className="w-full h-80 object-cover rounded-lg mb-4"
         />
