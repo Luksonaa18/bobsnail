@@ -50,60 +50,76 @@ export default function ProfilePage() {
   return (
     <>
       <Header />
-
-      <div className="relative min-h-screen flex flex-col items-center justify-center p-6 text-white bg-black">
-        {/* Background Image for all screen sizes */}
-        <div className="absolute inset-0">
+      {!user || !token ? (
+        <div className="flex flex-col items-center justify-center min-h-screen text-white bg-black">
           <Image
             src={background}
-            alt="Halloween background"
+            alt="Background"
             fill
             className="object-cover brightness-50"
             priority
           />
           <div className="absolute inset-0 bg-black/50" />
+          <div className="relative z-10 text-center">
+            <h1 className="text-3xl md:text-5xl text-orange-400 font-bold">
+              Don't have an account yet?
+            </h1>
+            <button
+              onClick={() => router.push("/register")}
+              className="mt-6 px-6 py-3 cursor-pointer bg-orange-500/20 rounded-xl text-orange-300 font-semibold"
+            >
+              Sign Up
+            </button>
+          </div>
         </div>
+      ) : (
+        // Profile Card
+        <div className="relative min-h-screen flex flex-col items-center justify-center p-6 text-white bg-black">
+          <div className="absolute inset-0">
+            <Image
+              src={background}
+              alt="Halloween background"
+              fill
+              className="object-cover brightness-50"
+              priority
+            />
+            <div className="absolute inset-0 bg-black/50" />
+          </div>
 
-        {/* Profile Card */}
-        <div className="relative z-10 bg-black/70 md:bg-neutral-900 md:shadow-xl rounded-3xl p-6 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl backdrop-blur-md">
-          <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6">
-            {/* Avatar */}
-            <div className="shrink-0">
-              <FaCircleUser className="text-7xl md:text-9xl text-orange-500 drop-shadow-[0_0_12px_#ff6600]" />
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 space-y-4">
-              <h1 className="text-3xl md:text-4xl font-bold text-orange-400">
-                Profile
-              </h1>
-
-              <div className="w-full h-px bg-orange-500/50 my-2" />
-
-              <div className="space-y-2 text-base md:text-lg">
-                <p>
-                  <strong className="text-orange-400">Name:</strong>{" "}
-                  {profile.name}
-                </p>
-                <p>
-                  <strong className="text-orange-400">Email:</strong>{" "}
-                  {profile.email}
-                </p>
+          <div className="relative z-10 bg-black/70 md:bg-neutral-900 md:shadow-xl rounded-3xl p-6 w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl xl:max-w-2xl backdrop-blur-md">
+            <div className="flex flex-col md:flex-row items-center md:items-start text-center md:text-left gap-6">
+              <div className="shrink-0">
+                <FaCircleUser className="text-7xl md:text-9xl text-orange-500 drop-shadow-[0_0_12px_#ff6600]" />
               </div>
-
-              <button
-                onClick={() => {
-                  logout(); // clear auth state
-                  router.push("/login"); // redirect to login page
-                }}
-                className="mt-4  w-full bg-orange-500/20 rounded-xl py-3 text-orange-300 font-semibold text-center cursor-pointer"
-              >
-                Log Out
-              </button>
+              <div className="flex-1 space-y-4">
+                <h1 className="text-3xl md:text-4xl font-bold text-orange-400">
+                  Profile
+                </h1>
+                <div className="w-full h-px bg-orange-500/50 my-2" />
+                <div className="space-y-2 text-base md:text-lg">
+                  <p>
+                    <strong className="text-orange-400">Name:</strong>{" "}
+                    {profile.name}
+                  </p>
+                  <p>
+                    <strong className="text-orange-400">Email:</strong>{" "}
+                    {profile.email}
+                  </p>
+                </div>
+                <button
+                  onClick={() => {
+                    logout();
+                    router.push("/login");
+                  }}
+                  className="mt-4 w-full bg-orange-500/20 rounded-xl py-3 text-orange-300 font-semibold text-center cursor-pointer"
+                >
+                  Log Out
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

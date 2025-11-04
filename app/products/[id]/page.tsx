@@ -68,7 +68,7 @@ const ProductPage = () => {
       <div className="w-full flex items-center justify-center">
         <button
           onClick={() => handleAddTocart()}
-          className="border w-40 rounded-lg h-15 text-orange-500"
+          className="border cursor-pointer hover:bg-orange-600 hover:text-white transition-all w-40 rounded-lg h-15 text-orange-500"
         >
           Add to cart
         </button>

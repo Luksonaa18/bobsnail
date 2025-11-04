@@ -8,7 +8,7 @@ import Loading from "../loading-state/Loading";
 import { useAuthStore, useCartStore } from "@/zustand";
 import { motion, AnimatePresence } from "framer-motion";
 import { useDebounce } from "use-debounce";
-import vampire from "@/public/eccom/ChatGPT Image Nov 1, 2025, 05_46_03 PM.png"
+import vampire from "@/public/eccom/ChatGPT Image Nov 1, 2025, 05_46_03 PM.png";
 import Image from "next/image";
 const Products = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -40,7 +40,9 @@ const Products = () => {
         setError(null);
 
         const url = `${process.env.NEXT_PUBLIC_API_URL}/products${
-          debouncedSearch ? `?search=${encodeURIComponent(debouncedSearch)}` : ""
+          debouncedSearch
+            ? `?search=${encodeURIComponent(debouncedSearch)}`
+            : ""
         }`;
 
         const res = await fetch(url);
